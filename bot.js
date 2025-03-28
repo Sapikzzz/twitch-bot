@@ -7,7 +7,7 @@ const client = new tmi.Client({
 	options: { debug: true },
 	identity: {
 		username: 'bot_name',
-		password: 'oauth:my_bot_token'
+		password: `oauth:${TOKEN}`
 	},
 	channels: [ 'my_channel' ]
 });

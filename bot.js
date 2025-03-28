@@ -1,15 +1,13 @@
 require('dotenv').config()
 
-TOKEN = process.env.TOKEN
-
 const tmi = require('tmi.js');
 const client = new tmi.Client({
 	options: { debug: true },
 	identity: {
-		username: 'bot_name',
-		password: `oauth:${TOKEN}`
+		username: 'uwuskochany',
+		password: `oauth:${process.env.TOKEN}`
 	},
-	channels: [ 'my_channel' ]
+	channels: [ 'sapik_' ]
 });
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {

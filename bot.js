@@ -1,5 +1,10 @@
 require('dotenv').config();
 const sprintf = require('sprintf-js').sprintf;
+const fs = require('node:fs')
+
+const folderPath = process.env.FOLDERPATH
+const channels = process.env.CHANNELS.split(',')
+console.log(channels)
 
 function getTimeOfMessage(){
 	const date = new Date();
@@ -16,18 +21,43 @@ function getTimeOfMessage(){
 
 const tmi = require('tmi.js');
 const client = new tmi.Client({
-	
 	identity: {
 		username: 'uwuskochany',
 		password: `oauth:${process.env.TOKEN}`
 	},
-	channels: [ 'h2p_gucio' ]
+	channels: channels
 });
 
 client.connect().catch(console.error);
+
+try {
+	if(fs.existsSync(folderPath)){
+		for (channel of client.opts.channels){
+			if(!fs.existsSync(folderPath + '/' + channel.substring(1))){
+				fs.mkdirSync(folderPath + '/' + channel.substring(1));
+			}
+		}
+	}
+	else{
+		fs.mkdirSync(folderPath);
+		for (channel of client.opts.channels){
+			if(!fs.existsSync(folderPath + '/' + channel)){
+				fs.mkdirSync(folderPath + '/' + channel.substring(1))
+			}
+		}
+	}
+} catch(err){
+		console.error(err)
+	}
+
 
 client.on('message', (channel, userstate, message, self) => {
 	if(self) return;
 	let timeOfMessage = getTimeOfMessage();
 	console.log(`[${timeOfMessage}] ${userstate['display-name']}: ${message}`)
+
+	fs.appendFile(`${folderPath}/${channel.substring(1)}/${userstate.username}.txt`, `[${timeOfMessage}] ${userstate['display-name']}: ${message}\n`, function(err){
+		if(err) throw err;
+	})
+
 });
